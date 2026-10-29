@@ -569,6 +569,8 @@ pub struct BaseMission {
     pub what: String,
     pub have: u32,
     pub need: u32,
+    /// The buildings that count (empty for the worker goal).
+    pub builds: Vec<String>,
 }
 
 /// The goals of camp level `level` (empty at the max level), with progress from the worker count and the
@@ -577,7 +579,7 @@ pub fn base_missions(db: &Db, level: u32, workers: u32, built: &[String]) -> Vec
     let Some(needs) = db.camp_level(level).and_then(|l| l.needs.as_ref()) else { return Vec::new() };
     let mut out = Vec::new();
     if needs.workers > 0 {
-        out.push(BaseMission { what: format!("Have {} creatures working at the camp", needs.workers), have: workers, need: needs.workers });
+        out.push(BaseMission { what: format!("Have {} creatures working at the camp", needs.workers), have: workers, need: needs.workers, builds: Vec::new() });
     }
     for (ids, n) in &needs.builds {
         let Some(first) = ids.first() else { continue };
@@ -588,7 +590,7 @@ pub fn base_missions(db: &Db, level: u32, workers: u32, built: &[String]) -> Vec
         let names: Vec<String> = ids.iter().map(|i| db.build(i).map_or(i.clone(), |b| b.name.clone())).collect();
         let what = format!("Build {}{}", names.join(" or "), if *n > 1 { format!(" x{n}") } else { String::new() });
         let _ = first;
-        out.push(BaseMission { what, have, need: *n });
+        out.push(BaseMission { what, have, need: *n, builds: ids.clone() });
     }
     out
 }

@@ -2,7 +2,7 @@
 cut leading silence, cap the length, fade out, loudness-normalise, mono Vorbis.
 
 Loudness: every clip is brought to the same loudest-moment level (max momentary loudness, 400 ms
-window, TARGET_LUFS) with a -1 dBFS limiter, so the per-sound volumes in crates/pw_game/src/sfx.rs alone
+window, TARGET_LUFS) with a -1 dBFS limiter, so the per-sound volumes in crates/ck_game/src/sfx.rs alone
 set the mix. Peak normalising (the old way) left 20+ dB between a short click and a long chime.
 
 Hand-edited clips in tools/sfx/hand/<name>.ogg are copied unchanged (the user's own edit wins).
@@ -23,6 +23,7 @@ MAX = {
     "node_break": 1.2, "pickup": 0.6, "throw": 0.8, "shake": 0.6, "capture": 2.5, "breakfree": 0.9,
     "build_place": 0.9, "build_done": 1.8, "craft_done": 1.0, "levelup": 2.0, "step": 0.35, "glide": 1.2,
     "splash": 1.0, "summon": 1.4, "eat": 1.0,
+    "cry_mossnut": 1.0, "cry_kindlet": 0.9, "cry_fluffin": 0.8, "cry_tinkit": 0.9, "cry_sprigling": 0.8,
 }
 
 

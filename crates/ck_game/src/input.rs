@@ -46,7 +46,7 @@ pub struct PlayerInput {
     pub rotate_pressed: bool,
     pub save_pressed: bool,
     pub load_pressed: bool,
-    /// F2: toggle free crafting (sandbox cheat).
+    /// F2: toggle free mode (crafting, building and technology cost nothing).
     pub cheat_pressed: bool,
     /// F3: sound on/off.
     pub mute_pressed: bool,

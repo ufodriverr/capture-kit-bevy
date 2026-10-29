@@ -598,6 +598,97 @@ impl GameData {
         self.world.camp_levels.iter().find(|l| l.level == level)
     }
 
+    /// Whether the game can be played through with this content: every material, mission item and
+    /// buildable thing can be obtained in the world (resource nodes, creature drops, ranch loot, crops,
+    /// recipes whose station can be built), every building with jobs can be worked by a creature that
+    /// spawns in the world, and every technology is reachable by level. Readable lines, empty = all good.
+    pub fn progression_problems(&self) -> Vec<String> {
+        use std::collections::HashSet;
+        let mut out = Vec::new();
+        let spawned: HashSet<&str> = self.world.spawns.iter().map(|s| s.0.as_str()).collect();
+        let mut have: HashSet<String> = HashSet::new();
+        for n in &self.world.nodes {
+            have.extend(n.batch.iter().chain(&n.last).map(|r| r.0.clone()));
+        }
+        for c in self.creatures.values().filter(|c| spawned.contains(c.id.as_str())) {
+            have.extend(c.drops.iter().map(|d| d.0.clone()));
+            if let Some(rows) = c.ranch.as_ref().and_then(|l| self.world.loot.get(l)) {
+                have.extend(rows.iter().map(|r| r.0.clone()));
+            }
+        }
+        let unlockable = |kind: &str, id: &str| self.technologies.iter().any(|t| t.level <= self.rules.max_level && if kind == "b" { t.builds.iter().any(|b| b == id) } else { t.recipes.iter().any(|r| r == id) });
+        let affordable = |mats: &[(String, u32)], have: &HashSet<String>| mats.iter().all(|(m, _)| have.contains(m));
+        // Grow the set until nothing new can be made: a recipe needs its materials and a buildable station,
+        // a crop needs a buildable field and its seed.
+        loop {
+            let before = have.len();
+            let buildable = |id: &str, have: &HashSet<String>| self.build(id).is_some_and(|b| (unlockable("b", &b.id) || self.rules.start_unlocked.iter().any(|t| self.tech(t).is_some_and(|t| t.builds.contains(&b.id)))) && affordable(&b.materials, have));
+            let mut new = Vec::new();
+            for r in &self.recipes {
+                if unlockable("r", &r.id) && buildable(&r.station, &have) && affordable(&r.materials, &have) {
+                    new.push(r.product.clone());
+                }
+            }
+            for b in &self.builds {
+                if let Some(c) = &b.crop
+                    && buildable(&b.id, &have)
+                    && have.contains(&c.seed)
+                {
+                    new.push(c.item.clone());
+                }
+                if let Some((p, _)) = &b.product
+                    && buildable(&b.id, &have)
+                {
+                    new.push(p.clone());
+                }
+            }
+            have.extend(new);
+            if have.len() == before {
+                break;
+            }
+        }
+        let missing = |id: &str| !have.contains(id);
+        for r in &self.recipes {
+            for (m, _) in r.materials.iter().filter(|(m, _)| missing(m)) {
+                out.push(format!("recipe {}: material \"{m}\" can't be obtained", r.id));
+            }
+            if !unlockable("r", &r.id) {
+                out.push(format!("recipe {}: no technology unlocks it", r.id));
+            }
+        }
+        for b in &self.builds {
+            for (m, _) in b.materials.iter().filter(|(m, _)| missing(m)) {
+                out.push(format!("building {}: material \"{m}\" can't be obtained", b.id));
+            }
+            if !unlockable("b", &b.id) {
+                out.push(format!("building {}: no technology unlocks it", b.id));
+            }
+            for j in &b.jobs {
+                let needs_hands = self.job(&j.job).is_some_and(|x| x.hands);
+                let worker = self.creatures.values().any(|c| spawned.contains(c.id.as_str()) && c.job_rank(&j.job) >= j.rank && (!needs_hands || c.hands));
+                if !worker && !j.player {
+                    out.push(format!("building {}: no spawning creature can do its \"{}\" job (rank {})", b.id, j.job, j.rank));
+                }
+            }
+        }
+        for m in &self.world.missions {
+            if let Goal::Have(i, _) | Goal::Craft(i) | Goal::Equip(i) = &m.goal
+                && missing(i)
+            {
+                out.push(format!("mission \"{}\": \"{i}\" can't be obtained", m.title));
+            }
+        }
+        for t in &self.technologies {
+            if t.level > self.rules.max_level {
+                out.push(format!("tech {}: level {} is above the max level", t.id, t.level));
+            }
+        }
+        for c in self.creatures.values().filter(|c| !spawned.contains(c.id.as_str())) {
+            out.push(format!("creature {}: never spawns (world.ron spawns)", c.id));
+        }
+        out
+    }
+
     /// Every reference to an id that doesn't exist, as readable lines (empty = all good).
     pub fn validate(&self) -> Vec<String> {
         let mut out = Vec::new();
@@ -746,6 +837,28 @@ mod tests {
 
     pub fn data() -> GameData {
         GameData::load(&GameData::default_dir()).expect("content loads")
+    }
+
+    #[test]
+    fn content_can_be_played_through() {
+        let d = data();
+        let p = d.progression_problems();
+        assert!(p.is_empty(), "{}", p.join("
+"));
+    }
+
+    #[test]
+    fn progression_check_catches_gaps() {
+        // Without wild creatures nothing drops hides or ember sacs and no one works the camp.
+        let mut d = data();
+        d.world.spawns.clear();
+        let p = d.progression_problems();
+        assert!(p.iter().any(|l| l.contains("ember_sac")) && p.iter().any(|l| l.contains("no spawning creature")), "{p:?}");
+        // Without the copper ore node, ingots, gear parts and the better orbs can't be made.
+        let mut d = data();
+        d.world.nodes.retain(|n| n.kind != NodeKind::Ore);
+        let p = d.progression_problems();
+        assert!(p.iter().any(|l| l.contains("copper_ingot")), "{p:?}");
     }
 
     #[test]

@@ -1,4 +1,4 @@
-//! Player settings (Esc menu): fullscreen or windowed, sound. Kept in `settings.json` next to the exe;
+//! Player settings (Esc menu): fullscreen or windowed, sound, free mode. Kept in `settings.json` next to the exe;
 //! hidden runs (scripts, screenshots) use a fixed windowed, muted setup and never write the file.
 
 use bevy::prelude::*;
@@ -13,6 +13,8 @@ pub const WINDOWED: (u32, u32) = (1600, 900);
 pub struct Settings {
     pub fullscreen: bool,
     pub muted: bool,
+    /// Free mode (F2): crafting, building and technology ignore their costs.
+    pub free: bool,
     /// False for hidden runs: nothing is written.
     #[serde(skip)]
     pub persist: bool,
@@ -20,13 +22,13 @@ pub struct Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { fullscreen: true, muted: false, persist: true }
+        Self { fullscreen: true, muted: false, free: false, persist: true }
     }
 }
 
 impl Settings {
     pub fn hidden() -> Self {
-        Self { fullscreen: false, muted: true, persist: false }
+        Self { fullscreen: false, muted: true, free: false, persist: false }
     }
 
     pub fn path() -> std::path::PathBuf {
@@ -68,6 +70,14 @@ pub fn set_fullscreen(world: &mut World, on: bool) {
             w.position = WindowPosition::Centered(MonitorSelection::Current);
         }
     }
+}
+
+/// Free mode on / off (F2 does the same) and remember it.
+pub fn set_free(world: &mut World, on: bool) {
+    world.resource_mut::<crate::crafting::FreeCraft>().0 = on;
+    let mut s = world.resource_mut::<Settings>();
+    s.free = on;
+    s.clone().save();
 }
 
 /// Sound on / off (F3 does the same) and remember it.

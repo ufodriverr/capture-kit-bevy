@@ -106,6 +106,8 @@ pub enum Action {
     /// Settings: fullscreen (true) or windowed; sound on / off; quit the game.
     Fullscreen(bool),
     Sound(bool),
+    /// Free mode on / off.
+    Free(bool),
     Quit,
 }
 
@@ -216,6 +218,10 @@ fn apply_one(world: &mut World, db: &Db, a: &Action) -> Option<String> {
         Action::Sound(on) => {
             crate::settings::set_muted(world, !on);
             Some(if *on { "Sound on".to_owned() } else { "Sound off".to_owned() })
+        }
+        Action::Free(on) => {
+            crate::settings::set_free(world, *on);
+            Some(if *on { "Free mode on: crafting, building and technology cost nothing".to_owned() } else { "Free mode off".to_owned() })
         }
         Action::Quit => {
             world.write_message(AppExit::Success);
@@ -349,9 +355,15 @@ fn apply_one(world: &mut World, db: &Db, a: &Action) -> Option<String> {
         }
         Action::Unlock(id) => {
             let tech = db.tech(id)?.clone();
+            let free = world.resource::<crate::crafting::FreeCraft>().0;
             let mut p = world.resource_mut::<Progress>();
             if p.unlocked.contains(&tech.id) {
                 return Some("already unlocked".into());
+            }
+            // Free mode: no points, level or prerequisite needed.
+            if free {
+                p.unlocked.insert(tech.id.clone());
+                return Some(format!("unlocked {} (free mode)", tech.name));
             }
             if p.level < tech.level {
                 return Some(format!("rejected: needs level {}", tech.level));

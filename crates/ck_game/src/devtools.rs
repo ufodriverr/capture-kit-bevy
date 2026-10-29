@@ -14,7 +14,7 @@ pub struct DevArgs {
     pub auto: Option<String>,
     pub visible: bool,
     pub seed: u64,
-    /// `--sandbox`: material costs capped at 1, max level, free crafting (default off).
+    /// `--sandbox`: material costs capped at 1, max level, free mode (default off).
     pub easy: Option<bool>,
 }
 

@@ -26,3 +26,8 @@ Generated 2026-10-29 with ElevenLabs Sound Effects v2 (`eleven_text_to_sound_v2`
 | splash | Person jumping into a lake, medium water splash | entering water |
 | summon | Creature released from a capsule, soft magical whoosh with shimmering sparkle | summon (higher pitch on recall) |
 | eat | Crunchy bite and chewing of a fresh berry, short munch | player / creature eats |
+| cry_mossnut | Cute small tortoise creature grunt, low gentle hollow croak with a soft woody shell knock, single short cry, cartoon game creature | Mossnut hurt / defeated |
+| cry_kindlet | Cute little fire salamander creature chirp, quick raspy squeak with a tiny crackle of flame, single short cry, cartoon game creature | Kindlet hurt / defeated |
+| cry_fluffin | Cute fluffy bunny creature squeak, soft high-pitched airy "pip" with a little sniff, single short cry, cartoon game creature | Fluffin hurt / defeated |
+| cry_tinkit | Small raccoon creature chatter, quick mischievous chittering trill with a faint electric zap, single short cry, cartoon game creature | Tinkit hurt / defeated |
+| cry_sprigling | Tiny leafy plant sprite creature coo, soft breathy bubbly "pweep" with a rustle of leaves, single short cry, cartoon game creature | Sprigling hurt / defeated |

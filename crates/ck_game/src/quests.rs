@@ -150,7 +150,7 @@ fn show(db: Res<Db>, prog: Res<Progress>, ms: Res<Missions>, roster: Res<Creatur
         lines.push("SANDBOX (--sandbox): costs capped at 1, max level".to_owned());
     }
     if free.0 {
-        lines.push("FREE CRAFTING ON (F2): missing materials are ignored".to_owned());
+        lines.push("FREE MODE ON (F2): crafting, building and technology cost nothing".to_owned());
     }
     if ms.flash > 0.0 {
         lines.push(format!("MISSION COMPLETE: {}", ms.flash_title));
@@ -188,7 +188,7 @@ fn show(db: Res<Db>, prog: Res<Progress>, ms: Res<Missions>, roster: Res<Creatur
 
 /// Camp panel: level, workers / limit, and the next level's goals with ticks (shown once a Camp Core stands).
 #[allow(clippy::type_complexity)]
-fn base_panel(db: Res<Db>, roster: Res<Creatures>, bases: Query<&crate::building::BaseCamp>, built: Query<&Building, Without<Construction>>, mut panel: Query<&mut Visibility, With<BasePanel>>, mut t: Query<&mut Text, With<BaseText>>) {
+fn base_panel(db: Res<Db>, prog: Res<Progress>, roster: Res<Creatures>, bases: Query<&crate::building::BaseCamp>, built: Query<&Building, Without<Construction>>, mut panel: Query<&mut Visibility, With<BasePanel>>, mut t: Query<&mut Text, With<BaseText>>) {
     let (Ok(mut vis), Ok(mut t)) = (panel.single_mut(), t.single_mut()) else { return };
     let Some(bc) = bases.iter().next() else {
         *vis = Visibility::Hidden;
@@ -206,6 +206,11 @@ fn base_panel(db: Res<Db>, roster: Res<Creatures>, bases: Query<&crate::building
         for m in &missions {
             let tick = if m.have >= m.need { "[x]" } else { "[ ]" };
             lines.push(format!("{tick} {}  {}/{}", m.what, m.have.min(m.need), m.need));
+            // Not unlocked yet: say which technology gives it.
+            let locked = m.have < m.need && !m.builds.is_empty() && !m.builds.iter().any(|b| prog.build_unlocked(&db, b));
+            if let Some(t) = m.builds.first().filter(|_| locked).and_then(|b| db.technologies.iter().find(|t| t.builds.contains(b))) {
+                lines.push(format!("      (Technology: {}, Lv {})", t.name, t.level));
+            }
         }
         lines.push("(send creatures to work: F at the Camp Core)".into());
     }

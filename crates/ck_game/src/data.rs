@@ -49,6 +49,10 @@ fn sandbox(data: &mut GameData) {
 impl Db {
     pub fn load(easy: bool) -> anyhow::Result<Self> {
         let mut data = GameData::load(&GameData::default_dir())?;
+        // Not fatal, but the game can't be played through as it stands.
+        for p in data.progression_problems() {
+            eprintln!("content warning: {p}");
+        }
         if easy {
             sandbox(&mut data);
         }

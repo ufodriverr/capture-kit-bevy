@@ -32,8 +32,8 @@ impl Plugin for InteractPlugin {
 /// Interactables that open a menu (sent on a tap, not on the press).
 type HasMenu = Or<(With<crate::crafting::Station>, With<crate::building::Storage>, With<crate::building::BaseCamp>, With<crate::base_tools::RepairBench>, With<crate::base_tools::PriorityBoard>)>;
 
-fn find_focus(input: Res<PlayerInput>, mut focus: ResMut<Focus>, mut out: MessageWriter<Interact>, player: Query<&Mover, With<Player>>, q: Query<(Entity, &GlobalTransform, &Interactable, &InheritedVisibility)>, menus: Query<(), HasMenu>) {
-    let Ok(m) = player.single() else { return };
+fn find_focus(input: Res<PlayerInput>, mut focus: ResMut<Focus>, mut out: MessageWriter<Interact>, mut player: Query<&mut Mover, With<Player>>, q: Query<(Entity, &GlobalTransform, &Interactable, &InheritedVisibility)>, menus: Query<(), HasMenu>) {
+    let Ok(mut m) = player.single_mut() else { return };
     let fwd = m.forward();
     let mut best: Option<(f32, Entity, &str)> = None;
     for (e, tf, it, vis) in &q {
@@ -56,6 +56,17 @@ fn find_focus(input: Res<PlayerInput>, mut focus: ResMut<Focus>, mut out: Messag
         }
     }
     focus.0 = best.map(|(_, e, p)| (e, p.to_owned()));
+    // Pressing or holding F turns the player to what it acts on (picking up, building, working), as a swing
+    // turns to the crosshair.
+    if let Some((e, _)) = &focus.0
+        && (input.interact_pressed || input.interact_held)
+        && let Ok((_, tf, ..)) = q.get(*e)
+    {
+        let to = (tf.translation() - m.feet).with_y(0.0);
+        if to.length_squared() > 0.01 {
+            m.yaw = crate::kinematic::yaw_of(to);
+        }
+    }
     if let Some((e, _)) = &focus.0
         && (if menus.contains(*e) { input.interact_tapped } else { input.interact_pressed })
     {

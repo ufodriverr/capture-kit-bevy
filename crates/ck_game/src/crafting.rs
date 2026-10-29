@@ -66,7 +66,7 @@ pub fn queue(db: &Db, station: &mut Station, inv: &mut Inventory, recipe: &str, 
     let r = db.recipe(recipe).ok_or("unknown recipe")?;
     for (m, c) in &r.materials {
         if !free && inv.count(m) < c * n {
-            return Err(format!("not enough {} ({}/{}; F2 = free crafting)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m), c * n));
+            return Err(format!("not enough {} ({}/{}; F2 = free mode)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m), c * n));
         }
     }
     for (m, c) in &r.materials {
@@ -106,10 +106,12 @@ impl Plugin for CraftingPlugin {
     }
 }
 
-fn toggle_free(time: Res<Time>, input: Res<PlayerInput>, mut free: ResMut<FreeCraft>, mut log: ResMut<crate::log::GameLog>) {
+fn toggle_free(time: Res<Time>, input: Res<PlayerInput>, mut free: ResMut<FreeCraft>, mut settings: ResMut<crate::settings::Settings>, mut log: ResMut<crate::log::GameLog>) {
     if input.cheat_pressed {
         free.0 = !free.0;
-        log.say(&time, format!("free crafting {}", if free.0 { "ON: missing materials are ignored" } else { "OFF" }));
+        settings.free = free.0;
+        settings.save();
+        log.say(&time, format!("free mode {}", if free.0 { "ON: crafting, building and technology cost nothing" } else { "OFF" }));
     }
 }
 

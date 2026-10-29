@@ -274,7 +274,7 @@ pub fn repair(db: &Db, inv: &mut Inventory, which: Option<&str>, free: bool) -> 
         }
     }
     if !free && let Some((m, n)) = total.iter().find(|(m, n)| inv.count(m) < **n) {
-        return format!("repair rejected: not enough {} ({}/{n}; F2 = free crafting)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m));
+        return format!("repair rejected: not enough {} ({}/{n}; F2 = free mode)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m));
     }
     for (m, n) in &total {
         let take = (*n).min(inv.count(m));

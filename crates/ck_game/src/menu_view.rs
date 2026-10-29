@@ -493,6 +493,8 @@ fn tech(ctx: Ctx) -> Box<dyn FnOnce(&mut C)> {
                                 let unlocks: Vec<String> = tc.builds.iter().map(|b| ctx.db.build(b).map_or(b.clone(), |x| x.name.clone())).chain(tc.recipes.iter().map(|r| ctx.db.recipe(r).map_or(r.clone(), |x| ctx.item_name(&x.product)))).collect();
                                 let state = if done {
                                     "Unlocked".to_owned()
+                                } else if ctx.free {
+                                    "Free mode: click to unlock".to_owned()
                                 } else if !reached {
                                     format!("Needs Player Lv {lv}")
                                 } else if p.tech_points < tc.cost {
@@ -501,8 +503,9 @@ fn tech(ctx: Ctx) -> Box<dyn FnOnce(&mut C)> {
                                     format!("Click to unlock for {} point(s)", tc.cost)
                                 };
                                 let tip = Tooltip { title: tc.name.clone(), body: format!("{}\nUnlocks: {}\n{state}", wrap(&crate::ui::rich(&ctx.db, &tc.desc), 60), unlocks.join(", ")) };
-                                let badge = if done { ("OK".to_owned(), hex("1EFF9E")) } else { (tc.cost.to_string(), if p.tech_points >= tc.cost { hex("FFE645") } else { hex("FF3F3F") }) };
-                                tile(g, 112.0, icon, &tc.name, (!done && reached).then(|| Action::Unlock(tc.id.clone())), tip, !reached, Some(badge), false);
+                                let badge = if done { ("OK".to_owned(), hex("1EFF9E")) } else if ctx.free { ("free".to_owned(), hex("1EFF9E")) } else { (tc.cost.to_string(), if p.tech_points >= tc.cost { hex("FFE645") } else { hex("FF3F3F") }) };
+                                let open = reached || ctx.free;
+                                tile(g, 112.0, icon, &tc.name, (!done && open).then(|| Action::Unlock(tc.id.clone())), tip, !open, Some(badge), false);
                             }
                         });
                     });
@@ -543,7 +546,7 @@ fn build(ctx: Ctx) -> Box<dyn FnOnce(&mut C)> {
                     let enough = ctx.free || b.materials.iter().all(|(m, n)| ctx.inv.count(m) >= *n);
                     let mats = b.materials.iter().map(|(m, n)| format!("{}  {} / {n}{}", ctx.item_name(m), ctx.inv.count(m), if ctx.inv.count(m) >= *n { "" } else { "  (missing)" })).collect::<Vec<_>>().join("\n");
                     let suit = b.jobs.iter().map(|j| format!("{} {}", crate::base_tools::suit_name(&ctx.db, &j.job), j.rank)).collect::<Vec<_>>().join(", ");
-                    let body = format!("{}\n\nMaterials:\n{mats}\nWork {:.0}{}{}", wrap(&crate::ui::rich(&ctx.db, &b.desc), 60), b.work, if suit.is_empty() { String::new() } else { format!("\nWorked by: {suit}") }, if enough { "\n\nClick to place".to_owned() } else { "\n\nNot enough materials (F2 = free crafting)".to_owned() });
+                    let body = format!("{}\n\nMaterials:\n{mats}\nWork {:.0}{}{}", wrap(&crate::ui::rich(&ctx.db, &b.desc), 60), b.work, if suit.is_empty() { String::new() } else { format!("\nWorked by: {suit}") }, if enough { "\n\nClick to place".to_owned() } else { "\n\nNot enough materials (F2 = free mode)".to_owned() });
                     tile(g, 108.0, ctx.icons.build(&b.id), &b.name, Some(Action::Build(b.id.clone())), Tooltip { title: b.name.clone(), body }, !enough, None, false);
                 }
             });
@@ -1018,8 +1021,9 @@ fn camp_core(world: &mut World, ctx: Ctx) -> Box<dyn FnOnce(&mut C)> {
 fn settings_screen(world: &World) -> Box<dyn FnOnce(&mut C)> {
     let full = world.resource::<crate::settings::Settings>().fullscreen;
     let muted = crate::sfx::is_muted(world);
+    let free = world.resource::<crate::crafting::FreeCraft>().0;
     Box::new(move |c: &mut C| {
-        window(c, 660.0, 290.0, 600.0, 480.0, |w| {
+        window(c, 660.0, 260.0, 600.0, 560.0, |w| {
             header(w, 12.0, 20.0, 576.0, "Settings");
             let label = |w: &mut C, y: f32, s: &str| {
                 w.spawn((t(s, 13.0, hex(TEXT)), Node { position_type: PositionType::Absolute, left: px(36.0), top: px(y), ..default() }));
@@ -1040,10 +1044,13 @@ fn settings_screen(world: &World) -> Box<dyn FnOnce(&mut C)> {
             label(w, 162.0, "Sound");
             choice(w, 200.0, 152.0, "On", !muted, Action::Sound(true));
             choice(w, 390.0, 152.0, "Off", muted, Action::Sound(false));
-            w.spawn((t("Saved for the next start. F3 also toggles sound.", 11.0, white(0.55)), Node { position_type: PositionType::Absolute, left: px(36.0), top: px(214.0), ..default() }));
-            button(w, abs(150.0, 290.0, 300.0, 46.0), "Resume (Esc)", 14.0, Some(Action::Close), None);
-            button(w, abs(150.0, 356.0, 300.0, 46.0), "Quit Game", 14.0, Some(Action::Quit), None);
-            w.spawn((t("Quitting doesn't save: F5 quick-saves first.", 11.0, white(0.55)), Node { position_type: PositionType::Absolute, left: px(150.0), top: px(414.0), ..default() }));
+            label(w, 232.0, "Free mode");
+            choice(w, 200.0, 222.0, "On", free, Action::Free(true));
+            choice(w, 390.0, 222.0, "Off", !free, Action::Free(false));
+            w.spawn((t("Free mode: crafting, building and technology cost nothing (no points or level needed).\nSaved for the next start. F2 toggles free mode, F3 sound.", 11.0, white(0.55)), Node { position_type: PositionType::Absolute, left: px(36.0), top: px(280.0), ..default() }));
+            button(w, abs(150.0, 370.0, 300.0, 46.0), "Resume (Esc)", 14.0, Some(Action::Close), None);
+            button(w, abs(150.0, 436.0, 300.0, 46.0), "Quit Game", 14.0, Some(Action::Quit), None);
+            w.spawn((t("Quitting doesn't save: F5 quick-saves first.", 11.0, white(0.55)), Node { position_type: PositionType::Absolute, left: px(150.0), top: px(494.0), ..default() }));
         });
     })
 }
@@ -1073,7 +1080,7 @@ fn repair_screen(ctx: Ctx) -> Box<dyn FnOnce(&mut C)> {
             if !list.is_empty() {
                 button(w, abs(570.0, 700.0, 200.0, 40.0), "Repair All", 13.0, Some(Action::Repair(None)), None);
             }
-            w.spawn((t("Cost: half the item's recipe, scaled by the missing durability. F2 free crafting applies.", 10.0, white(0.5)), Node { position_type: PositionType::Absolute, left: px(24.0), top: px(712.0), ..default() }));
+            w.spawn((t("Cost: half the item's recipe, scaled by the missing durability. Free mode (F2) applies.", 10.0, white(0.5)), Node { position_type: PositionType::Absolute, left: px(24.0), top: px(712.0), ..default() }));
         });
     })
 }

@@ -91,7 +91,7 @@ fn main() -> AppExit {
         .configure_sets(Update, (Sim::Player, Sim::Creatures, Sim::Combat, Sim::Last).chain())
         .insert_resource(db.move_tuning())
         .insert_resource(progress::Progress::start(&db))
-        .insert_resource(crafting::FreeCraft(db.easy))
+        .insert_resource(crafting::FreeCraft(db.easy || settings.free))
         .insert_resource(db)
         .insert_resource(settings)
         .init_resource::<log::GameLog>()

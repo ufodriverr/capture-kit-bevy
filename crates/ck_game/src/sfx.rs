@@ -19,7 +19,19 @@ use crate::resources::{NodeKind, ResourceNode};
 
 const CLIPS: &[&str] = &[
     "ui_click", "ui_open", "swing", "hit", "creature_cry", "pickaxe", "axe", "node_break", "pickup", "throw", "shake", "capture", "breakfree", "build_place", "build_done", "craft_done", "levelup", "step", "glide", "splash", "summon", "eat",
+    "cry_mossnut", "cry_kindlet", "cry_fluffin", "cry_tinkit", "cry_sprigling",
 ];
+
+/// A species' own cry (`cry_<species>`), or the shared one for species without their own clip.
+fn cry_for(species: &str) -> &'static str {
+    CLIPS.iter().find(|c| c.strip_prefix("cry_") == Some(species)).copied().unwrap_or("creature_cry")
+}
+
+/// The cry of the first species named in a log line ("Fluffin Lv3 defeated").
+fn cry_in(line: &str) -> &'static str {
+    let low = line.to_lowercase();
+    CLIPS.iter().find(|c| c.strip_prefix("cry_").is_some_and(|s| low.contains(s))).copied().unwrap_or("creature_cry")
+}
 
 /// Sounds further than this from the player are not played.
 const HEAR_M: f32 = 40.0;
@@ -132,7 +144,7 @@ fn for_line(line: &str) -> Option<Play> {
     } else if line.ends_with(" destroyed") {
         Play("node_break", 0.6, 1.0)
     } else if line.ends_with(" defeated") || line.ends_with(" is incapacitated") {
-        Play("creature_cry", 0.5, 0.8)
+        Play(cry_in(line), 0.5, 0.8)
     } else if line.ends_with("-> Glide") {
         Play("glide", 0.5, 1.0)
     } else if line.ends_with("-> Swim") {
@@ -142,7 +154,7 @@ fn for_line(line: &str) -> Option<Play> {
         Play("pickup", 0.4, 1.0)
     } else if has("rejected") {
         Play("ui_click", 0.28, 0.6)
-    } else if line.starts_with("weapon slot") || line.starts_with("free crafting") || line.starts_with("order: ") {
+    } else if line.starts_with("weapon slot") || line.starts_with("free mode") || line.starts_with("order: ") {
         Play("ui_click", 0.32, 1.0)
     } else {
         return None;
@@ -160,7 +172,7 @@ fn play(
     (mut hits, mut damaged): (MessageReader<HitMsg>, MessageReader<Damaged>),
     (player, rig): (Query<(&Mover, &Locomotion), With<Player>>, Query<&crate::anim::PlayerRig>),
     spots: Query<&GlobalTransform>,
-    (nodes, roster): (Query<&ResourceNode>, Query<(), With<CreatureActor>>),
+    (nodes, roster): (Query<&ResourceNode>, Query<&CreatureActor>),
     swings: Query<(), Added<Swing>>,
     throws: Query<(), Added<OrbBall>>,
     buttons: Query<&Interaction, (Changed<Interaction>, With<Button>)>,
@@ -197,8 +209,11 @@ fn play(
         }
     }
     for d in damaged.read() {
-        if !d.killed && d.slip.is_none() && roster.contains(d.target) {
-            out.push(Play("creature_cry", 0.35 * near(d.target), 1.0));
+        if !d.killed
+            && d.slip.is_none()
+            && let Ok(a) = roster.get(d.target)
+        {
+            out.push(Play(cry_for(&a.species), 0.35 * near(d.target), 1.0));
         }
     }
     if !swings.is_empty() {
@@ -227,7 +242,7 @@ fn play(
     for Play(clip, vol, speed) in out {
         let gap = match clip {
             "step" => 0.0,
-            "creature_cry" => 0.7,
+            c if c == "creature_cry" || c.starts_with("cry_") => 0.7,
             _ => 0.08,
         };
         if vol <= 0.01 || mixer.last.get(clip).is_some_and(|t| now - t < gap) {

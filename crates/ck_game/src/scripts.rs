@@ -272,7 +272,13 @@ pub fn script(name: &str) -> Option<Vec<Step>> {
             Step { setup: Some(|w| report_menu(w, "after 2nd Esc")), ..hold(0.3, "start placing a workbench", |_| {}) },
             Step { setup: Some(|w| w.resource_mut::<crate::menus::Clicks>().0.push(crate::menus::Action::Build("workbench".into()))), ..hold(0.5, "placing", |_| {}) },
             Step { setup: Some(|w| report_menu(w, "placing")), ..hold(0.3, "Esc while placing", |i| i.escape_pressed = true) },
-            Step { setup: Some(|w| report_menu(w, "after Esc while placing")), ..hold(0.2, "end", |_| {}) },
+            Step { setup: Some(|w| report_menu(w, "after Esc while placing")), ..hold(0.2, "unlock Grand Orb (Lv12) without free mode", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Unlock("grand_orb".into()))), ..hold(0.3, "refused?", |_| {}) },
+            Step { setup: Some(|w| report_menu(w, "grand orb, free mode off")), ..hold(0.2, "free mode on in Settings", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Free(true))), ..hold(0.3, "free mode on", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Unlock("grand_orb".into()))), ..hold(0.3, "unlock Grand Orb again", |_| {}) },
+            Step { setup: Some(|w| report_menu(w, "grand orb, free mode on")), ..hold(0.2, "free mode off", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Free(false))), ..hold(0.2, "end", |_| {}) },
         ],
         "slope" => vec![
             // Stand still on slopes of about 10, 20 and 30 degrees: the feet must not creep downhill.
@@ -354,7 +360,10 @@ pub fn script(name: &str) -> Option<Vec<Step>> {
             Step { setup: Some(|w| { drop_at(w, "wood", 3, Vec3::new(0.0, 0.0, -1.8)); drop_at(w, "stone", 2, Vec3::new(0.0, 0.0, -7.0)); report_bag_items(w, "dropped Wood 1.8 m and Stone 7 m in front"); }), ..hold(1.5, "wait", |_| {}) },
             Step { setup: Some(|w| report_bag_items(w, "after 1.5 s standing")), ..hold(2.0, "walk toward the Stone", fwd) },
             Step { setup: Some(|w| report_bag_items(w, "after walking")), ..hold(1.0, "stand", |_| {}) },
-            Step { setup: Some(|w| report_bag_items(w, "end")), ..hold(0.1, "end", |_| {}) },
+            Step { setup: Some(|w| report_bag_items(w, "end")), ..hold(0.1, "next to a pebble, turned 60 deg away", |_| {}) },
+            Step { setup: Some(pebble_side_on), ..hold(0.5, "settle", |_| {}) },
+            Step { setup: Some(|w| report_turn(w, "before F")), ..hold(0.1, "press F", |i| i.interact_pressed = true) },
+            Step { setup: Some(|w| report_turn(w, "after F")), ..hold(0.1, "end", |_| {}) },
         ],
         "steps" => vec![
             Step { teleport: Some((Vec2::new(5.0, 5.0), None)), yaw: Some(0.0), pitch: Some(-0.2), ..hold(1.0, "idle", |_| {}) },
@@ -406,6 +415,8 @@ pub fn script(name: &str) -> Option<Vec<Step>> {
             Step { shot: Some("tech"), ..hold(0.6, "T: technology", |i| i.tech_pressed = true) },
             Step { setup: Some(|w| click(w, crate::menus::Action::Unlock("archery".into()))), ..hold(0.3, "unlock Archery (Lv3, 2 pt)", |_| {}) },
             Step { setup: Some(|w| click(w, crate::menus::Action::Unlock("ranch".into()))), ..hold(0.3, "unlock the Ranch (Lv4): refused", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Free(true))), shot: Some("tech_free"), ..hold(0.6, "free mode: every tile open", |_| {}) },
+            Step { setup: Some(|w| click(w, crate::menus::Action::Free(false))), ..hold(0.3, "free mode off", |_| {}) },
             hold(0.3, "Esc", |i| i.escape_pressed = true),
             Step { shot: Some("build"), ..hold(0.6, "B: build list", |i| i.build_pressed = true) },
             Step { setup: Some(|w| click(w, crate::menus::Action::Build("workbench".into()))), shot: Some("ghost"), ..hold(0.6, "pick the workbench: ghost", |_| {}) },
@@ -1202,6 +1213,36 @@ fn nearest_wild(w: &mut World, from: Vec3) -> Option<(Entity, Vec3)> {
 fn player_feet(w: &mut World) -> Vec3 {
     let mut q = w.query_filtered::<&Mover, With<Player>>();
     q.iter(w).next().map_or(Vec3::ZERO, |m| m.feet)
+}
+
+/// Stands 1 m from the nearest pebble with it 60 degrees to the side (still in reach and in focus).
+fn pebble_side_on(w: &mut World) {
+    let p = player_feet(w);
+    let mut q = w.query::<(&crate::resources::ResourceNode, &GlobalTransform)>();
+    let Some(t) = q.iter(w).filter(|(n, _)| n.kind == crate::resources::NodeKind::Pebble).map(|(_, t)| t.translation()).min_by(|a, b| a.distance(p).total_cmp(&b.distance(p))) else {
+        println!("[pickup] no pebble in the world");
+        return;
+    };
+    put_player_near(w, t, 1.0);
+    let mut q = w.query_filtered::<&mut Mover, With<Player>>();
+    for mut m in q.iter_mut(w) {
+        m.yaw += 60f32.to_radians();
+    }
+    w.insert_resource(TurnTarget(t));
+}
+
+#[derive(Resource)]
+struct TurnTarget(Vec3);
+
+/// The angle between the player's facing and the pebble.
+fn report_turn(w: &mut World, when: &str) {
+    let Some(t) = w.get_resource::<TurnTarget>().map(|t| t.0) else { return };
+    let mut q = w.query_filtered::<&Mover, With<Player>>();
+    if let Some(m) = q.iter(w).next() {
+        let to = (t - m.feet).with_y(0.0).normalize_or_zero();
+        let off = m.forward().with_y(0.0).normalize_or_zero().angle_between(to).to_degrees();
+        println!("[pickup] {when}: {off:.0} deg off the pebble");
+    }
 }
 
 fn put_player_near(w: &mut World, target: Vec3, dist: f32) {

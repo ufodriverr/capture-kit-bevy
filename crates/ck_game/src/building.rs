@@ -222,7 +222,7 @@ fn place(
         Err(format!("blocked by {}", names.get(*blocker).map_or("something", |n| n.as_str())))
     } else if let Some((m, _)) = b.materials.iter().find(|(m, n)| !free.0 && inv.count(m) < *n) {
         let need = b.materials.iter().find(|(x, _)| x == m).map_or(0, |x| x.1);
-        Err(format!("not enough {} ({}/{need}; F2 = free crafting)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m)))
+        Err(format!("not enough {} ({}/{need}; F2 = free mode)", db.item(m).map_or(m.as_str(), |i| i.name.as_str()), inv.count(m)))
     } else {
         Ok(())
     };
