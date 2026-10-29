@@ -2121,7 +2121,7 @@ dependencies = [
 
 [[package]]
 name = "ck_core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "rand_chacha",
@@ -2132,7 +2132,7 @@ dependencies = [
 
 [[package]]
 name = "ck_game"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "avian3d",
