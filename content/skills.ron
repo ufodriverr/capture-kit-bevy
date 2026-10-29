@@ -1,0 +1,24 @@
+// Creature skills. Ranges in metres, cooldown in seconds.
+//   action: Shot(speed: m/s, radius: m)                     a projectile toward the target
+//           Roll(time: s, speed: m/s, homing: rad/s, radius: m)  curl up and tumble into the target
+[
+    (id: "shell_roll", name: "Shell Roll", desc: "Tucks into its shell and rolls into the target.", element: Earth, power: 40, min_range: 0, max_range: 9, cooldown: 5, action: Roll(time: 2.6, speed: 6.5, homing: 1.2, radius: 0.6)),
+    (id: "pebble_toss", name: "Pebble Toss", desc: "Flicks a stone at the target.", element: Earth, power: 30, min_range: 2, max_range: 15, cooldown: 4, action: Shot(speed: 22, radius: 0.25)),
+    (id: "boulder_slam", name: "Boulder Slam", desc: "Hurls a heavy rock.", element: Earth, power: 70, min_range: 3, max_range: 18, cooldown: 12, action: Shot(speed: 18, radius: 0.45)),
+
+    (id: "ember_spit", name: "Ember Spit", desc: "Spits a hot ember.", element: Fire, power: 30, min_range: 2, max_range: 16, cooldown: 4, action: Shot(speed: 24, radius: 0.25)),
+    (id: "flare_burst", name: "Flare Burst", desc: "A bigger ball of flame.", element: Fire, power: 50, min_range: 2, max_range: 16, cooldown: 8, action: Shot(speed: 20, radius: 0.35)),
+    (id: "blaze_orb", name: "Blaze Orb", desc: "A slow, scorching orb of fire.", element: Fire, power: 80, min_range: 3, max_range: 20, cooldown: 14, action: Shot(speed: 14, radius: 0.5)),
+
+    (id: "hop_kick", name: "Hop Kick", desc: "Bounds forward and kicks.", element: Neutral, power: 35, min_range: 0, max_range: 6, cooldown: 4, action: Roll(time: 0.9, speed: 7.0, homing: 2.0, radius: 0.5)),
+    (id: "fluff_puff", name: "Fluff Puff", desc: "Blows a ball of fluff.", element: Neutral, power: 28, min_range: 2, max_range: 14, cooldown: 4, action: Shot(speed: 20, radius: 0.3)),
+    (id: "burrow_rush", name: "Burrow Rush", desc: "Dashes in low and fast.", element: Neutral, power: 60, min_range: 0, max_range: 10, cooldown: 10, action: Roll(time: 1.6, speed: 9.0, homing: 1.6, radius: 0.55)),
+
+    (id: "zap_bolt", name: "Zap Bolt", desc: "Snaps a spark at the target.", element: Spark, power: 32, min_range: 2, max_range: 16, cooldown: 4, action: Shot(speed: 30, radius: 0.22)),
+    (id: "static_snap", name: "Static Snap", desc: "A crackling bolt.", element: Spark, power: 50, min_range: 2, max_range: 16, cooldown: 8, action: Shot(speed: 28, radius: 0.3)),
+    (id: "storm_coil", name: "Storm Coil", desc: "A coil of lightning.", element: Spark, power: 85, min_range: 3, max_range: 20, cooldown: 15, action: Shot(speed: 26, radius: 0.45)),
+
+    (id: "leaf_dart", name: "Leaf Dart", desc: "Throws a sharp leaf.", element: Leaf, power: 30, min_range: 2, max_range: 16, cooldown: 4, action: Shot(speed: 24, radius: 0.22)),
+    (id: "seed_spray", name: "Seed Spray", desc: "Spits a hard seed.", element: Leaf, power: 48, min_range: 2, max_range: 16, cooldown: 8, action: Shot(speed: 22, radius: 0.3)),
+    (id: "thorn_volley", name: "Thorn Volley", desc: "Launches a ball of thorns.", element: Leaf, power: 78, min_range: 3, max_range: 18, cooldown: 14, action: Shot(speed: 18, radius: 0.45)),
+]

@@ -1,0 +1,12 @@
+// Bond skills: what a summoned companion does when the player presses F with nothing to interact with.
+//   kind: Shield(duration: s, cooldown: s)   the companion becomes a shield on the player's arm and
+//                                            takes hits from the front
+//         Carry(weight: kg)                  passive: more carry weight while it is in the party
+//         None                               described only (not implemented in this version)
+[
+    (id: "shell_guard", name: "Shell Guard", desc: "Mossnut clings to your arm as a living shield and takes hits from the front.", kind: Shield(duration: 30, cooldown: 10)),
+    (id: "flame_breath", name: "Flame Breath", desc: "Kindlet rides on your shoulder and breathes fire forward.", kind: None),
+    (id: "fluff_gift", name: "Fluff Gift", desc: "At a Ranch, Fluffin sheds fluff now and then.", kind: None),
+    (id: "pack_pouch", name: "Pack Pouch", desc: "Tinkit carries a pouch: more carry weight while it is in your party.", kind: Carry(weight: 50)),
+    (id: "seed_shot", name: "Seed Shot", desc: "Sprigling sits on your head and fires seeds at what you aim at.", kind: None),
+]

@@ -1,0 +1,74 @@
+// Buildings. The look of each one is in crates/ck_game/src/build_models.rs (same id).
+//   category: build-menu tab (Production, Creatures, Storage, Food, Camp, Lighting, Foundation, Defense, Furniture)
+//   materials: (item, count)      work: work points to finish the blueprint     exp: player exp when done
+//   role: what it does once built
+//     Station               crafts the recipes that list this building (recipes.ron)
+//     Storage(slots, food_only)
+//     Core(radius: m)       the camp centre: creatures assigned to the camp live and work around it
+//     Ranch                 creatures with the ranch job produce their `ranch` loot here
+//     Repair, JobBoard, Bed, CreatureBed
+//   jobs: (job, rank, workers, player, task)  who can work it; workers 0 = no limit; task orders the work
+//         (rules.ron task_order)
+//   product: (item, work)    a worker makes one item per `work` points (quarry, lumber yard)
+//   crop: (item, count, seed_work, water_work, harvest_work, grow_s, seed)  a field: plant, water, wait, harvest
+//   max: how many one camp may have (0 = no limit)   near_core: only inside a camp
+[
+    // Production
+    (id: "workbench", name: "Workbench", category: "Production", desc: "Craft tools, orbs and gear here.", materials: [("wood", 3)], work: 100, exp: 1.0, role: Station, jobs: [("craft", 1, 0, true, "craft")]),
+    (id: "repair_bench", name: "Repair Bench", category: "Production", desc: "Mend worn tools and gear.", materials: [("wood", 6), ("stone", 4)], work: 200, exp: 1.0, role: Repair),
+    (id: "smelter", name: "Smelter", category: "Production", desc: "Turns ore into ingots. Needs a creature that can kindle.", materials: [("stone", 30), ("wood", 10)], work: 800, exp: 1.5, role: Station, jobs: [("kindle", 1, 1, false, "smelt")]),
+    (id: "stone_quarry", name: "Stone Quarry", category: "Production", desc: "Creatures with the mining job dig stone here.", materials: [("wood", 30), ("stone", 10)], work: 800, exp: 1.5, near_core: true, jobs: [("mine", 1, 0, false, "produce")], product: Some(("stone", 600))),
+    (id: "lumber_yard", name: "Lumber Yard", category: "Production", desc: "Creatures with the chopping job cut wood here.", materials: [("wood", 30), ("stone", 10)], work: 800, exp: 1.5, near_core: true, jobs: [("chop", 1, 3, false, "produce")], product: Some(("wood", 600))),
+    // Creatures
+    (id: "camp_core", name: "Camp Core", category: "Creatures", desc: "Marks your camp. Assign captured creatures here to live and work.", materials: [("stone", 5), ("wood", 5), ("spark_shard", 1)], work: 300, exp: 2.0, max: 1, role: Core(radius: 30)),
+    (id: "ranch", name: "Ranch", category: "Creatures", desc: "Ranching creatures produce goods here.", materials: [("wood", 40), ("stone", 10), ("fiber", 10)], work: 800, exp: 1.5, near_core: true, role: Ranch, jobs: [("ranch", 1, 4, false, "ranch")]),
+    (id: "job_board", name: "Job Board", category: "Creatures", desc: "Set each creature's job priorities and assign them to stations.", materials: [("wood", 15), ("stone", 5)], work: 300, exp: 1.0, max: 1, near_core: true, role: JobBoard),
+    (id: "creature_bed", name: "Straw Nest", category: "Creatures", desc: "A camp creature sleeps here at night and rests better.", materials: [("wood", 4), ("fiber", 8)], work: 150, exp: 1.0, near_core: true, role: CreatureBed),
+    // Storage
+    (id: "storage_chest", name: "Storage Chest", category: "Storage", desc: "Ten slots of storage.", materials: [("wood", 10)], work: 150, exp: 1.0, role: Storage(slots: 10, food_only: false)),
+    (id: "large_chest", name: "Large Chest", category: "Storage", desc: "Twenty slots of storage.", materials: [("wood", 20), ("stone", 10)], work: 300, exp: 1.0, role: Storage(slots: 20, food_only: false)),
+    (id: "barrel", name: "Barrel", category: "Storage", desc: "Six slots of storage.", materials: [("wood", 8)], work: 120, exp: 1.0, role: Storage(slots: 6, food_only: false)),
+    (id: "crate", name: "Crate", category: "Storage", desc: "Six slots of storage.", materials: [("wood", 6)], work: 100, exp: 1.0, role: Storage(slots: 6, food_only: false)),
+    (id: "shelf", name: "Shelf", category: "Storage", desc: "Eight slots of storage.", materials: [("wood", 10)], work: 150, exp: 1.0, role: Storage(slots: 8, food_only: false)),
+    // Food
+    (id: "campfire", name: "Campfire", category: "Food", desc: "Cook food. Needs fire: kindle it yourself or let a creature do it.", materials: [("wood", 4), ("stone", 2)], work: 100, exp: 1.0, role: Station, jobs: [("kindle", 1, 1, true, "cook")]),
+    (id: "feed_box", name: "Feed Box", category: "Food", desc: "Camp creatures eat from here.", materials: [("wood", 15), ("stone", 5)], work: 300, exp: 1.0, near_core: true, role: Storage(slots: 10, food_only: true)),
+    (id: "berry_patch", name: "Berry Patch", category: "Food", desc: "Plant, water and harvest berries.", materials: [("berry_seeds", 3), ("wood", 20), ("stone", 10)], work: 400, exp: 1.0, near_core: true,
+        jobs: [("plant", 1, 2, true, "plant"), ("water", 1, 2, true, "water"), ("gather", 1, 2, true, "harvest")],
+        crop: Some(("berries", 8, 3000, 3000, 3000, 150, "berry_seeds"))),
+    // Camp
+    (id: "bed", name: "Bed", category: "Camp", desc: "Sleep through the night (F, after dusk).", materials: [("wood", 10), ("fiber", 10), ("cloth", 2)], work: 300, exp: 1.0, role: Bed),
+    (id: "signpost", name: "Signpost", category: "Camp", desc: "Points the way home.", materials: [("wood", 4)], work: 60, exp: 0.5),
+    (id: "scarecrow", name: "Scarecrow", category: "Camp", desc: "A straw guard for the fields.", materials: [("wood", 6), ("fiber", 6)], work: 100, exp: 0.5),
+    (id: "banner", name: "Banner", category: "Camp", desc: "Fly your colours.", materials: [("wood", 4), ("cloth", 2)], work: 80, exp: 0.5),
+    // Lighting
+    (id: "standing_torch", name: "Standing Torch", category: "Lighting", desc: "Lights up the area at night.", materials: [("wood", 3), ("stone", 1)], work: 60, exp: 0.5),
+    (id: "wall_torch", name: "Wall Torch", category: "Lighting", desc: "A torch for walls.", materials: [("wood", 2), ("stone", 1)], work: 60, exp: 0.5),
+    (id: "fireplace", name: "Fireplace", category: "Lighting", desc: "A stone hearth that lights and warms a room.", materials: [("stone", 20), ("wood", 5)], work: 300, exp: 1.0),
+    // Foundation
+    (id: "wood_foundation", name: "Wood Foundation", category: "Foundation", desc: "A flat floor to build on.", materials: [("wood", 4)], work: 60, exp: 0.3),
+    (id: "wood_triangle_foundation", name: "Wood Triangle Floor", category: "Foundation", desc: "A triangular floor.", materials: [("wood", 2)], work: 40, exp: 0.3),
+    (id: "wood_wall", name: "Wood Wall", category: "Foundation", desc: "A plain wall.", materials: [("wood", 3)], work: 50, exp: 0.3),
+    (id: "wood_window_wall", name: "Wood Window Wall", category: "Foundation", desc: "A wall with a window.", materials: [("wood", 3)], work: 50, exp: 0.3),
+    (id: "wood_door", name: "Wood Door", category: "Foundation", desc: "A wall with a doorway.", materials: [("wood", 4)], work: 60, exp: 0.3),
+    (id: "wood_triangle_wall", name: "Wood Gable", category: "Foundation", desc: "A triangular wall for roof ends.", materials: [("wood", 2)], work: 40, exp: 0.3),
+    (id: "wood_roof", name: "Wood Roof", category: "Foundation", desc: "A flat roof.", materials: [("wood", 3)], work: 50, exp: 0.3),
+    (id: "wood_slanted_roof", name: "Wood Slanted Roof", category: "Foundation", desc: "A sloped roof.", materials: [("wood", 3)], work: 50, exp: 0.3),
+    (id: "wood_stairs", name: "Wood Stairs", category: "Foundation", desc: "Stairs up one floor.", materials: [("wood", 6)], work: 80, exp: 0.3),
+    (id: "wood_pillar", name: "Wood Pillar", category: "Foundation", desc: "A support post.", materials: [("wood", 2)], work: 30, exp: 0.3),
+    (id: "wood_fence", name: "Wood Fence", category: "Foundation", desc: "A low fence.", materials: [("wood", 2)], work: 30, exp: 0.3),
+    (id: "wood_ladder", name: "Wood Ladder", category: "Foundation", desc: "Climb up and down.", materials: [("wood", 3)], work: 40, exp: 0.3),
+    // Defense
+    (id: "spiked_wall", name: "Spiked Wall", category: "Defense", desc: "Sharpened stakes that keep intruders out.", materials: [("wood", 8), ("stone", 2)], work: 120, exp: 0.5),
+    (id: "wood_gate", name: "Wood Gate", category: "Defense", desc: "A big gate for a palisade.", materials: [("wood", 20)], work: 200, exp: 0.5),
+    (id: "snare", name: "Snare", category: "Defense", desc: "A rope snare.", materials: [("wood", 3), ("fiber", 6)], work: 80, exp: 0.5),
+    // Furniture
+    (id: "table", name: "Table", category: "Furniture", desc: "A square wooden table.", materials: [("wood", 6)], work: 80, exp: 0.3),
+    (id: "round_table", name: "Round Table", category: "Furniture", desc: "A round wooden table.", materials: [("wood", 6)], work: 80, exp: 0.3),
+    (id: "chair", name: "Chair", category: "Furniture", desc: "Have a seat.", materials: [("wood", 3)], work: 40, exp: 0.3),
+    (id: "stool", name: "Stool", category: "Furniture", desc: "A three-legged stool.", materials: [("wood", 2)], work: 30, exp: 0.3),
+    (id: "bench", name: "Bench", category: "Furniture", desc: "Seats two.", materials: [("wood", 4)], work: 50, exp: 0.3),
+    (id: "counter", name: "Counter", category: "Furniture", desc: "A shop counter.", materials: [("wood", 8)], work: 80, exp: 0.3),
+    (id: "potted_plant", name: "Potted Plant", category: "Furniture", desc: "A little green for the room.", materials: [("stone", 2), ("fiber", 2)], work: 40, exp: 0.3),
+    (id: "rug", name: "Rug", category: "Furniture", desc: "A woven rug.", materials: [("cloth", 2)], work: 40, exp: 0.3),
+]

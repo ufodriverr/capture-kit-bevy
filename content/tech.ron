@@ -1,0 +1,32 @@
+// Technology: unlocked with tech points (gained per player level, rules.ron) once the player reaches
+// `level`. `require`: another technology that must be unlocked first. rules.ron `start_unlocked` lists
+// the ones a new game starts with.
+[
+    (id: "camp_basics", name: "Camp Basics", desc: "A workbench, a campfire and simple stone tools.", level: 1, cost: 0, builds: ["workbench", "campfire"], recipes: ["stone_axe", "stone_pickaxe", "wooden_club", "torch", "baked_berries", "baked_mushroom", "grilled_meat"]),
+    (id: "capture_orb", name: "Capture Orb", desc: "Orbs for capturing weakened creatures.", level: 1, cost: 1, recipes: ["capture_orb"]),
+    (id: "camp_core", name: "Camp Core", desc: "Found a camp where captured creatures can live and work.", level: 2, cost: 1, builds: ["camp_core"]),
+    (id: "storage", name: "Storage Chest", desc: "Somewhere to keep things.", level: 2, cost: 1, builds: ["storage_chest"]),
+    (id: "clothing", name: "Clothing", desc: "Weave cloth and sew a tunic.", level: 2, cost: 1, recipes: ["cloth", "cloth_tunic"]),
+    (id: "feed_box", name: "Feed Box", desc: "Feed your camp creatures.", level: 3, cost: 2, builds: ["feed_box"]),
+    (id: "archery", name: "Archery", desc: "A short bow and arrows.", level: 3, cost: 2, recipes: ["short_bow", "arrow"]),
+    (id: "beds", name: "Beds", desc: "A bed for you and nests for your creatures.", level: 3, cost: 2, builds: ["bed", "creature_bed"]),
+    (id: "ranch", name: "Ranch", desc: "Let creatures produce goods.", level: 4, cost: 2, builds: ["ranch"], require: Some("camp_core")),
+    (id: "farming", name: "Berry Patch", desc: "Grow your own berries.", level: 4, cost: 2, builds: ["berry_patch"], require: Some("camp_core")),
+    (id: "wood_building", name: "Wood Building", desc: "Floors, walls, doors, roofs and stairs.", level: 4, cost: 2, builds: ["wood_foundation", "wood_triangle_foundation", "wood_wall", "wood_window_wall", "wood_door", "wood_triangle_wall", "wood_roof", "wood_slanted_roof", "wood_stairs", "wood_pillar"]),
+    (id: "repair", name: "Repair Bench", desc: "Mend worn gear.", level: 5, cost: 2, builds: ["repair_bench"]),
+    (id: "lighting", name: "Lighting", desc: "Torches for the night.", level: 5, cost: 2, builds: ["standing_torch", "wall_torch"]),
+    (id: "job_board", name: "Job Board", desc: "Manage who works where.", level: 5, cost: 2, builds: ["job_board"], require: Some("camp_core")),
+    (id: "spear", name: "Spear and Shield", desc: "Better weapons for close fights.", level: 6, cost: 3, recipes: ["stone_spear", "wooden_shield"]),
+    (id: "fire_arrows", name: "Fire Arrows", desc: "Arrows that set targets alight.", level: 6, cost: 3, recipes: ["fire_arrow"], require: Some("archery")),
+    (id: "venom_arrows", name: "Venom Arrows", desc: "Arrows that poison targets.", level: 6, cost: 3, recipes: ["venom_arrow"], require: Some("archery")),
+    (id: "glider", name: "Leaf Glider", desc: "Glide from high places.", level: 7, cost: 3, recipes: ["leaf_glider"]),
+    (id: "quarry", name: "Stone Quarry", desc: "Creatures dig stone for you.", level: 7, cost: 3, builds: ["stone_quarry"], require: Some("camp_core")),
+    (id: "lumber", name: "Lumber Yard", desc: "Creatures cut wood for you.", level: 7, cost: 3, builds: ["lumber_yard"], require: Some("camp_core")),
+    (id: "smelting", name: "Smelter", desc: "Smelt copper ore into ingots.", level: 8, cost: 3, builds: ["smelter"], recipes: ["copper_ingot"]),
+    (id: "furniture", name: "Furniture", desc: "Tables, chairs, shelves and decorations.", level: 8, cost: 3, builds: ["table", "round_table", "chair", "stool", "bench", "counter", "potted_plant", "rug", "shelf", "barrel", "crate", "signpost", "banner", "scarecrow"]),
+    (id: "feather_band", name: "Feather Band", desc: "Headgear woven with feathers.", level: 9, cost: 3, recipes: ["feather_band"], require: Some("clothing")),
+    (id: "fine_orb", name: "Fine Orb", desc: "Better orbs, planks and gear parts.", level: 10, cost: 4, recipes: ["fine_orb", "plank", "gear_parts"], require: Some("smelting")),
+    (id: "defenses", name: "Defenses", desc: "Walls, gates, fences and snares.", level: 10, cost: 4, builds: ["spiked_wall", "wood_gate", "snare", "wood_fence", "wood_ladder"]),
+    (id: "storage_2", name: "Large Chest and Fireplace", desc: "More storage and a warm hearth.", level: 12, cost: 4, builds: ["large_chest", "fireplace"], require: Some("storage")),
+    (id: "grand_orb", name: "Grand Orb", desc: "The best orbs a camp can make.", level: 12, cost: 5, recipes: ["grand_orb"], require: Some("fine_orb")),
+]

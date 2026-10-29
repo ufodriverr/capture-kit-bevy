@@ -1,0 +1,7 @@
+/target/
+/dist/
+*.log
+*.stackdump
+# Local saves and settings written next to the game.
+/saves/
+settings.json

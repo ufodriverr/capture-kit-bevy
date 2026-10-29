@@ -1,0 +1,25 @@
+[package]
+name = "ck_game"
+description = "Capture Kit game on Bevy: world, player, creatures, combat, capture, camp, UI."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "capture-kit"
+path = "src/main.rs"
+
+[dependencies]
+bevy.workspace = true
+avian3d.workspace = true
+ck_core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rand_core.workspace = true
+rand_chacha.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true

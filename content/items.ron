@@ -1,0 +1,56 @@
+// Items. Every field but id, name and kind is optional.
+//   kind: Material, Food, Weapon, Armor, Glider, Orb, Ammo
+//   sub:  Weapon: Melee, Axe, Pickaxe, Spear, Bow, Torch, Shield | Armor: Body, Head | Ammo: Arrow
+//   food: hunger restored when eaten        orb_level: capture strength of an orb
+//   element / status: what an arrow's hit carries (status: "burn" or "poison", see rules.ron)
+//   icon: assets/ui/icons/<icon>.png (default: the id)
+[
+    // Materials
+    (id: "wood", name: "Wood", kind: "Material", desc: "Chopped from trees. The first thing every camp needs.", max_stack: 999, weight: 0.5),
+    (id: "stone", name: "Stone", kind: "Material", desc: "Broken off rocks and boulders.", max_stack: 999, weight: 0.8),
+    (id: "fiber", name: "Fiber", kind: "Material", desc: "Tough plant strands from trees and bushes.", max_stack: 999, weight: 0.1),
+    (id: "spark_shard", name: "Spark Shard", kind: "Material", desc: "A blue crystal that hums faintly. Capture orbs are made from it.", max_stack: 999, weight: 0.1),
+    (id: "copper_ore", name: "Copper Ore", kind: "Material", desc: "Reddish ore. Smelt it into ingots.", max_stack: 999, weight: 1.5),
+    (id: "copper_ingot", name: "Copper Ingot", kind: "Material", desc: "Smelted copper, ready for tools.", max_stack: 999, weight: 1.0),
+    (id: "fluff", name: "Fluff", kind: "Material", desc: "Soft fur shed by Fluffins.", max_stack: 999, weight: 0.1),
+    (id: "cloth", name: "Cloth", kind: "Material", desc: "Woven from fluff.", max_stack: 999, weight: 0.2),
+    (id: "hide", name: "Hide", kind: "Material", desc: "Leathery skin from wild creatures.", max_stack: 999, weight: 0.4),
+    (id: "plank", name: "Plank", kind: "Material", desc: "Sawn and smoothed wood.", max_stack: 999, weight: 0.4),
+    (id: "gear_parts", name: "Gear Parts", kind: "Material", desc: "Copper fittings for sturdier machines.", max_stack: 999, weight: 0.5),
+    (id: "ember_sac", name: "Ember Sac", kind: "Material", desc: "Warm to the touch. Dropped by Kindlets.", max_stack: 999, weight: 0.1),
+    (id: "thorn_sap", name: "Thorn Sap", kind: "Material", desc: "A sticky, stinging sap from Sprigling thorns.", max_stack: 999, weight: 0.1),
+    (id: "berry_seeds", name: "Berry Seeds", kind: "Material", desc: "Plant them in a Berry Patch.", max_stack: 999, weight: 0.1),
+
+    // Food
+    (id: "berries", name: "Wild Berries", kind: "Food", desc: "Sweet and juicy. Grows on bushes.", max_stack: 999, weight: 0.1, food: 6),
+    (id: "baked_berries", name: "Baked Berries", kind: "Food", desc: "Berries warmed over a fire. More filling.", max_stack: 999, weight: 0.1, food: 15),
+    (id: "mushroom", name: "Mushroom", kind: "Food", desc: "Earthy. Better cooked.", max_stack: 999, weight: 0.1, food: 5),
+    (id: "baked_mushroom", name: "Baked Mushroom", kind: "Food", desc: "A roasted mushroom.", max_stack: 999, weight: 0.1, food: 14),
+    (id: "raw_meat", name: "Raw Meat", kind: "Food", desc: "Cook it before eating.", max_stack: 999, weight: 0.3, food: 8),
+    (id: "grilled_meat", name: "Grilled Meat", kind: "Food", desc: "A hearty meal.", max_stack: 999, weight: 0.3, food: 30),
+    (id: "egg", name: "Egg", kind: "Food", desc: "A small speckled egg.", max_stack: 999, weight: 0.2, food: 6),
+
+    // Orbs (thrown with Q to capture)
+    (id: "capture_orb", name: "Capture Orb", kind: "Orb", desc: "Throw it at a weakened creature to capture it.", max_stack: 999, weight: 0.2, orb_level: 8, rarity: 0),
+    (id: "fine_orb", name: "Fine Orb", kind: "Orb", desc: "A better-made orb for stronger creatures.", max_stack: 999, weight: 0.2, orb_level: 16, rarity: 1),
+    (id: "grand_orb", name: "Grand Orb", kind: "Orb", desc: "A masterwork orb.", max_stack: 999, weight: 0.2, orb_level: 26, rarity: 2, icon: "fine_orb"),
+
+    // Tools and weapons
+    (id: "stone_axe", name: "Stone Axe", kind: "Weapon", sub: "Axe", desc: "Chops trees much faster than bare hands.", weight: 4.0, durability: 150, attack: 30),
+    (id: "stone_pickaxe", name: "Stone Pickaxe", kind: "Weapon", sub: "Pickaxe", desc: "Breaks rock and ore.", weight: 4.0, durability: 150, attack: 30),
+    (id: "wooden_club", name: "Wooden Club", kind: "Weapon", sub: "Melee", desc: "A heavy stick. Does the job.", weight: 3.0, durability: 120, attack: 45),
+    (id: "stone_spear", name: "Stone Spear", kind: "Weapon", sub: "Spear", desc: "Long reach, solid hits.", weight: 4.0, durability: 160, attack: 60),
+    (id: "short_bow", name: "Short Bow", kind: "Weapon", sub: "Bow", desc: "Aim with the right mouse button. Uses arrows.", weight: 5.0, durability: 150, attack: 60, magazine: 1),
+    (id: "torch", name: "Torch", kind: "Weapon", sub: "Torch", desc: "Lights the way at night.", weight: 1.5, durability: 300, attack: 12),
+    (id: "wooden_shield", name: "Wooden Shield", kind: "Weapon", sub: "Shield", desc: "A round shield of planks.", weight: 3.0, durability: 200, attack: 5),
+
+    // Ammo
+    (id: "arrow", name: "Arrow", kind: "Ammo", sub: "Arrow", desc: "For bows.", max_stack: 999, weight: 0.03),
+    (id: "fire_arrow", name: "Fire Arrow", kind: "Ammo", sub: "Arrow", desc: "For bows. Sets the target on fire.", max_stack: 999, weight: 0.03, element: Some(Fire), status: Some("burn")),
+    (id: "venom_arrow", name: "Venom Arrow", kind: "Ammo", sub: "Arrow", desc: "For bows. Poisons the target.", max_stack: 999, weight: 0.03, status: Some("poison"), icon: "arrow"),
+
+    // Armor and gear
+    (id: "cloth_tunic", name: "Cloth Tunic", kind: "Armor", sub: "Body", desc: "Simple clothes that keep the wind off.", weight: 3.0, durability: 150, hp: 60, defense: 10),
+    (id: "feather_band", name: "Feather Band", kind: "Armor", sub: "Head", desc: "A woven band with a few bright feathers.", weight: 1.0, durability: 180, hp: 40, defense: 8),
+    (id: "leaf_glider", name: "Leaf Glider", kind: "Glider", desc: "Hold Space in the air to glide.", weight: 2.0, durability: 300),
+]

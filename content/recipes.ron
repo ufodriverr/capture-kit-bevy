@@ -1,0 +1,30 @@
+// Recipes: (id, product, count, materials, work points, exp, station building id).
+// A recipe is available once a technology (tech.ron) unlocks it.
+[
+    // Workbench
+    (id: "stone_axe", product: "stone_axe", materials: [("wood", 5), ("stone", 5)], work: 200, station: "workbench"),
+    (id: "stone_pickaxe", product: "stone_pickaxe", materials: [("wood", 5), ("stone", 5)], work: 200, station: "workbench"),
+    (id: "wooden_club", product: "wooden_club", materials: [("wood", 8)], work: 150, station: "workbench"),
+    (id: "torch", product: "torch", materials: [("wood", 2), ("fiber", 1)], work: 80, station: "workbench"),
+    (id: "capture_orb", product: "capture_orb", materials: [("spark_shard", 1), ("stone", 2), ("wood", 1)], work: 120, station: "workbench"),
+    (id: "fine_orb", product: "fine_orb", materials: [("spark_shard", 3), ("copper_ingot", 1), ("stone", 3)], work: 300, station: "workbench"),
+    (id: "grand_orb", product: "grand_orb", materials: [("spark_shard", 6), ("copper_ingot", 3), ("gear_parts", 1)], work: 600, station: "workbench"),
+    (id: "cloth", product: "cloth", materials: [("fluff", 2)], work: 150, station: "workbench"),
+    (id: "cloth_tunic", product: "cloth_tunic", materials: [("cloth", 3), ("fiber", 4)], work: 300, station: "workbench"),
+    (id: "feather_band", product: "feather_band", materials: [("fiber", 5), ("cloth", 1), ("hide", 1)], work: 250, station: "workbench"),
+    (id: "short_bow", product: "short_bow", materials: [("wood", 12), ("fiber", 6), ("stone", 2)], work: 300, station: "workbench"),
+    (id: "arrow", product: "arrow", count: 5, materials: [("wood", 1), ("stone", 1)], work: 60, station: "workbench"),
+    (id: "fire_arrow", product: "fire_arrow", count: 5, materials: [("wood", 1), ("stone", 1), ("ember_sac", 1)], work: 80, station: "workbench"),
+    (id: "venom_arrow", product: "venom_arrow", count: 5, materials: [("wood", 1), ("stone", 1), ("thorn_sap", 1)], work: 80, station: "workbench"),
+    (id: "stone_spear", product: "stone_spear", materials: [("wood", 10), ("stone", 6), ("fiber", 4)], work: 350, station: "workbench"),
+    (id: "wooden_shield", product: "wooden_shield", materials: [("wood", 12), ("fiber", 4)], work: 300, station: "workbench"),
+    (id: "leaf_glider", product: "leaf_glider", materials: [("wood", 15), ("fiber", 12), ("cloth", 4)], work: 500, station: "workbench"),
+    (id: "plank", product: "plank", materials: [("wood", 2)], work: 80, station: "workbench"),
+    (id: "gear_parts", product: "gear_parts", materials: [("copper_ingot", 2)], work: 200, station: "workbench"),
+    // Smelter
+    (id: "copper_ingot", product: "copper_ingot", materials: [("copper_ore", 2)], work: 900, station: "smelter"),
+    // Campfire
+    (id: "baked_berries", product: "baked_berries", materials: [("berries", 3)], work: 150, station: "campfire"),
+    (id: "baked_mushroom", product: "baked_mushroom", materials: [("mushroom", 2)], work: 150, station: "campfire"),
+    (id: "grilled_meat", product: "grilled_meat", materials: [("raw_meat", 1)], work: 200, station: "campfire"),
+]

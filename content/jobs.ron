@@ -1,0 +1,18 @@
+// Jobs creatures (and the player) can do at the camp. A creature's talent rank for a job (creatures.ron)
+// picks its work speed from `speeds` (index = rank, 0 = can't). Work amounts in buildings.ron and
+// recipes.ron are in "work points"; speed is work points per second.
+//   hands: the job needs hands (only creatures with `hands: true` can do it)
+[
+    (id: "kindle", name: "Kindling", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "water", name: "Watering", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "plant", name: "Planting", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "power", name: "Powering", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "craft", name: "Crafting", speeds: [0, 40, 70, 100, 140, 180], hands: true),
+    (id: "gather", name: "Gathering", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "chop", name: "Chopping", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "mine", name: "Mining", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "brew", name: "Brewing", speeds: [0, 40, 70, 100, 140, 180], hands: true),
+    (id: "chill", name: "Chilling", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "haul", name: "Hauling", speeds: [0, 40, 70, 100, 140, 180]),
+    (id: "ranch", name: "Ranching", speeds: [0, 40, 70, 100, 140, 180]),
+]

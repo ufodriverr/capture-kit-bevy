@@ -1,0 +1,114 @@
+// Game rules and tuning. Times in seconds, distances in metres, rates per second unless noted.
+(
+    // The player.
+    player_hp: 400,
+    player_stamina: 100,
+    player_attack: 100,
+    player_defense: 100,
+    player_craft_speed: 100,
+    hunger_max: 100,
+    hunger_rate: 0.08,
+    starving_hp_percent: 1.0,
+    carry_weight: 250,
+    max_level: 50,
+    tech_points_per_level: 3,
+    status_points_per_level: 1,
+    // What one status point adds.
+    point_hp: 80,
+    point_stamina: 10,
+    point_attack: 3,
+    point_work_speed: 40,
+    point_weight: 40,
+
+    // Stamina costs.
+    sprint_stamina: 8,
+    jump_stamina: 8,
+    glide_stamina: 9,
+    swim_stamina: 4,
+    swim_dash_stamina: 10,
+
+    // Day and night: game minutes per real minute, hours 0..24.
+    start_hour: 8,
+    time_scale: 30,
+    night_start: 19,
+    night_end: 5,
+
+    // Experience: next level needs exp_base * level ^ exp_power; creatures use the same curve.
+    exp_base: 30,
+    exp_power: 1.5,
+    defeat_exp_base: 10,
+    defeat_exp_per_level: 6,
+    build_exp: 6,
+    craft_exp: 4,
+    capture_bonus_count: 5,
+    start_unlocked: ["camp_basics"],
+
+    // Creature stats: stat = species stat x (growth_base + growth_per_level x level) x talent + flat.
+    // A talent of 100 adds talent_bonus (0.25 = +25 %).
+    hp_growth_base: 2.0,
+    hp_growth_per_level: 0.4,
+    hp_flat: 200,
+    attack_growth_base: 0.8,
+    attack_growth_per_level: 0.06,
+    attack_flat: 40,
+    defense_growth_base: 0.8,
+    defense_growth_per_level: 0.06,
+    defense_flat: 30,
+    talent_bonus: 0.25,
+
+    // Damage = damage_scale x power x attack / (defense + defense_soak), then the rates below.
+    damage_scale: 1.2,
+    defense_soak: 30,
+    skill_damage_rate: 1.0,
+    creature_to_player_rate: 0.6,
+    same_element_rate: 1.25,
+    weak_point_rate: 1.5,
+    sleeping_rate: 2.0,
+    element_strong: 1.5,
+    element_weak: 0.7,
+    // (attacker, defender) pairs where the attacker is strong.
+    element_chart: [
+        (Fire, Leaf), (Fire, Frost), (Water, Fire), (Water, Earth), (Leaf, Water), (Leaf, Earth),
+        (Spark, Water), (Spark, Frost), (Earth, Spark), (Earth, Fire), (Frost, Leaf), (Frost, Earth),
+    ],
+    companion_cooldown_rate: 1.0,
+    recall_cooldown: 2.0,
+
+    // Hitting resource nodes: damage x rate (the right tool, a creature skill, anything else).
+    node_tool_rate: 8,
+    node_skill_rate: 4,
+    node_weapon_rate: 2,
+    node_min_damage: 1,
+
+    // Capture. chance = hp_factor x level_factor x species catch_rate x status bonus (x back bonus when
+    // the creature hasn't noticed you):
+    //   hp_factor    = 1 - capture_hp_weight x (hp / max hp)
+    //   level_factor = clamp((orb level - creature level + capture_level_window) / (2 x window), 0, 1)
+    // The orb shakes three times; each shake passes with chance^(weight), weights summing to 1.
+    capture_hp_weight: 0.8,
+    capture_level_window: 12,
+    capture_back_bonus: 1.3,
+    shake_weights: [0.34, 0.33, 0.33],
+
+    // Status effects (Fire / Venom Arrows): damage per tick = max HP x percent, every tick_s.
+    statuses: {
+        "burn": (name: "Burning", duration: 12, tick_s: 1.0, hp_percent: 1.2, capture_bonus: 0.25, immune: [Fire, Water], color: "FF7A1A"),
+        "poison": (name: "Poisoned", duration: 16, tick_s: 1.0, hp_percent: 1.0, capture_bonus: 0.25, immune: [], color: "B24DFF"),
+    },
+
+    // Creature needs at the camp. Mood (0..100) drops when hungry, recovers when full or resting.
+    creature_hp_regen_percent: 0.25,
+    full_threshold: 0.5,
+    mood_regen_full: 0.2,
+    mood_loss_hungry: 0.3,
+    mood_loss_starving: 1.0,
+    ground_sleep_mood_rate: 0.5,
+    stored_mood_regen: 1.0,
+
+    // The camp. Work is done in this order (building first, then the ranch, ...).
+    camp_min_distance: 60,
+    task_order: ["build", "ranch", "smelt", "cook", "harvest", "plant", "water", "produce", "craft", "haul"],
+
+    // Input: how long R is held to open the arrow list.
+    long_press: 0.25,
+)
